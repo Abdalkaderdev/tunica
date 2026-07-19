@@ -1,63 +1,73 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import ContactForm from "@/components/ContactForm";
+import { getDictionary } from "@/i18n/dictionaries";
+import { isLocale } from "@/i18n/config";
 import { site } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Get in touch with Tunica Group — real estate, luxury fashion, and hospitality in Erbil, Iraq. Let's talk about your next project.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  const dict = getDictionary(locale);
+  return {
+    title: dict.meta.contact.title,
+    description: dict.meta.contact.description,
+  };
+}
 
-type Detail = {
-  label: string;
-  value: string;
-  href?: string;
-  external?: boolean;
-  secondary?: string;
-  mapHref?: string;
-};
+export default async function ContactPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  if (!isLocale(locale)) notFound();
+  const dict = getDictionary(locale);
+  const t = dict.contactPage;
 
-const details: Detail[] = [
-  {
-    label: "Email",
-    value: site.email,
-    href: `mailto:${site.email}`,
-  },
-  {
-    label: "Phone",
-    value: site.phone,
-    href: `tel:${site.phoneHref}`,
-  },
-  {
-    label: "Office",
-    value: site.address.line1,
-    secondary: site.address.line2,
-    mapHref: site.address.maps,
-  },
-  {
-    label: "Instagram",
-    value: site.instagramHandle,
-    href: site.instagram,
-    external: true,
-  },
-];
+  type Detail = {
+    label: string;
+    value: string;
+    href?: string;
+    external?: boolean;
+    secondary?: string;
+    mapHref?: string;
+    ltr?: boolean;
+  };
 
-export default function ContactPage() {
+  const details: Detail[] = [
+    { label: t.labels.email, value: site.email, href: `mailto:${site.email}`, ltr: true },
+    { label: t.labels.phone, value: site.phone, href: `tel:${site.phoneHref}`, ltr: true },
+    {
+      label: t.labels.office,
+      value: site.address.line1,
+      secondary: site.address.line2,
+      mapHref: site.address.maps,
+      ltr: true,
+    },
+    {
+      label: t.labels.instagram,
+      value: site.instagramHandle,
+      href: site.instagram,
+      external: true,
+      ltr: true,
+    },
+  ];
+
   return (
     <>
-      <section className="wrap pt-32 pb-24">
+      <section className="wrap pb-24 pt-32">
         <div className="grid gap-16 md:grid-cols-2">
-          {/* Left — intro & details */}
           <div>
-            <p className="eyebrow">Contact</p>
+            <p className="eyebrow">{t.eyebrow}</p>
             <h1 className="mt-6 font-serif text-4xl leading-tight text-ink sm:text-5xl">
-              Let&apos;s talk about your next project.
+              {t.heading}
             </h1>
-            <p className="mt-6 max-w-md text-lg text-stone">
-              Whether you&apos;re exploring a development, a partnership, or a
-              conversation about what we do, we&apos;d be glad to hear from you.
-              Reach us using the details below, or send a message directly.
-            </p>
+            <p className="mt-6 max-w-md text-lg text-stone">{t.intro}</p>
 
             <dl className="mt-12 space-y-8">
               {details.map((detail) => (
@@ -65,7 +75,7 @@ export default function ContactPage() {
                   <dt className="text-xs uppercase tracking-wide text-gold">
                     {detail.label}
                   </dt>
-                  <dd className="mt-2 text-ink">
+                  <dd className="mt-2 text-ink" dir={detail.ltr ? "ltr" : undefined}>
                     {detail.href ? (
                       <a
                         href={detail.href}
@@ -80,9 +90,7 @@ export default function ContactPage() {
                       <span>{detail.value}</span>
                     )}
                     {detail.secondary ? (
-                      <span className="block text-stone">
-                        {detail.secondary}
-                      </span>
+                      <span className="block text-stone">{detail.secondary}</span>
                     ) : null}
                     {detail.mapHref ? (
                       <a
@@ -91,7 +99,7 @@ export default function ContactPage() {
                         rel="noopener noreferrer"
                         className="link-underline mt-2 inline-block text-sm text-gold"
                       >
-                        View on map ↗
+                        {dict.common.viewOnMap} ↗
                       </a>
                     ) : null}
                   </dd>
@@ -100,19 +108,17 @@ export default function ContactPage() {
             </dl>
           </div>
 
-          {/* Right — form */}
           <div>
-            <ContactForm />
+            <ContactForm dict={dict} />
           </div>
         </div>
       </section>
 
-      {/* Map band */}
-      <section aria-label="Our location on the map">
+      <section aria-label={t.mapTitle}>
         <div className="wrap pb-24">
           <iframe
             src="https://www.google.com/maps?q=Phoenix%20Tower%20Zagros%20Street%20Erbil%20Iraq&output=embed"
-            title="Map showing Tunica Group's location in Erbil, Iraq"
+            title={t.mapTitle}
             loading="lazy"
             className="h-[420px] w-full rounded-lg border border-ink/10"
             referrerPolicy="no-referrer-when-downgrade"

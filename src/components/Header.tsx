@@ -4,18 +4,30 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, m } from "motion/react";
-import { nav, site } from "@/lib/content";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import Logo from "@/components/Logo";
+import { getNav, localeHref, site } from "@/lib/content";
+import type { Dictionary } from "@/i18n/dictionaries";
+import type { Locale } from "@/i18n/config";
 
-export default function Header() {
+export default function Header({
+  locale,
+  dict,
+}: {
+  locale: Locale;
+  dict: Dictionary;
+}) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const nav = getNav(dict, locale);
+  const home = localeHref(locale, "/");
+  const contact = localeHref(locale, "/contact");
 
   // The home page opens on a dark, full-screen hero, so the header can start
   // transparent there. Every other route begins on a light background, where a
-  // transparent header would leave the cream nav text invisible — so it stays
-  // solid from the top.
-  const overDarkHero = pathname === "/";
+  // transparent header would leave the cream nav text invisible.
+  const overDarkHero = pathname === home;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -43,15 +55,15 @@ export default function Header() {
     >
       <div className="wrap flex items-center justify-between py-4">
         <Link
-          href="/"
+          href={home}
           onClick={() => setOpen(false)}
-          className="font-serif text-xl tracking-tightish text-cream"
+          className="text-cream"
           aria-label="Tunica Group — home"
         >
-          Tunica<span className="text-gold"> Group</span>
+          <Logo />
         </Link>
 
-        <nav className="hidden items-center gap-9 md:flex">
+        <nav className="hidden items-center gap-8 md:flex">
           {nav.map((item) => (
             <Link
               key={item.href}
@@ -61,8 +73,9 @@ export default function Header() {
               {item.label}
             </Link>
           ))}
-          <Link href="/contact" className="btn btn-light">
-            Start a Conversation
+          <LanguageSwitcher locale={locale} variant="dark" />
+          <Link href={contact} className="btn btn-light">
+            {dict.common.startConversation}
           </Link>
         </nav>
 
@@ -70,7 +83,7 @@ export default function Header() {
           type="button"
           onClick={() => setOpen((v) => !v)}
           className="relative z-50 flex h-10 w-10 items-center justify-center md:hidden"
-          aria-label={open ? "Close menu" : "Open menu"}
+          aria-label={open ? dict.common.close : dict.common.menu}
           aria-expanded={open}
         >
           <span className="relative block h-4 w-6">
@@ -114,12 +127,15 @@ export default function Header() {
                 </Link>
               ))}
               <Link
-                href="/contact"
+                href={contact}
                 onClick={() => setOpen(false)}
                 className="btn btn-light mt-6 self-start"
               >
-                Start a Conversation
+                {dict.common.startConversation}
               </Link>
+              <div className="mt-6">
+                <LanguageSwitcher locale={locale} variant="dark" />
+              </div>
               <div className="mt-6 space-y-1 text-sm text-cream/60">
                 <a href={`mailto:${site.email}`} className="block hover:text-gold">
                   {site.email}

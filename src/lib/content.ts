@@ -1,9 +1,10 @@
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/en";
+
+/** Locale-independent company data. */
 export const site = {
   name: "Tunica Group",
   shortName: "Tunica",
-  tagline: "Building lasting value across real estate, fashion & hospitality.",
-  description:
-    "Tunica Group is a diversified enterprise founded in 2018 in Erbil, Iraq, operating across real estate development, luxury fashion, and hospitality.",
   founded: 2018,
   url: "https://tunicagroup.com",
   email: "info@tunicagroup.com",
@@ -18,171 +19,180 @@ export const site = {
   },
 } as const;
 
-export const nav = [
-  { label: "About", href: "/about" },
-  { label: "Sectors", href: "/#sectors" },
-  { label: "Portfolio", href: "/portfolio" },
-  { label: "Contact", href: "/contact" },
-] as const;
+/** Prefix a path with the active locale, e.g. localeHref("ar", "/about") → "/ar/about". */
+export function localeHref(locale: Locale, path: string): string {
+  if (path === "/") return `/${locale}`;
+  return `/${locale}${path}`;
+}
 
-export type Sector = {
-  slug: string;
+export type SectorSlug = "real-estate" | "fashion" | "hospitality";
+
+/** Structural sector data — text comes from the dictionary, keyed by slug. */
+export const sectorMeta: {
+  slug: SectorSlug;
   index: string;
-  name: string;
-  kicker: string;
-  short: string;
-  description: string;
   image: string;
   imageAlt: string;
-  highlights: { label: string; value: string }[];
-  body: string[];
-};
-
-export const sectors: Sector[] = [
+}[] = [
   {
     slug: "real-estate",
     index: "01",
-    name: "Real Estate",
-    kicker: "Phoenix Tower & Developments",
-    short:
-      "Landmark mixed-use developments in the heart of Erbil's commercial district — designed for business, lifestyle, and long-term growth.",
-    description:
-      "Tunica's real estate arm develops, renovates, and extends mixed-use properties across Erbil, with Phoenix Tower as its flagship — a hub for business, lifestyle, and growth designed with sustainability and smart technology at its core.",
     image: "/images/phoenix-tower.jpg",
     imageAlt: "Phoenix Tower rising above Erbil's commercial district",
-    highlights: [
-      { label: "New Builds", value: "50+" },
-      { label: "Renovations", value: "50+" },
-      { label: "Extensions", value: "50+" },
-    ],
-    body: [
-      "Our real estate division has delivered landmark mixed-use developments across Erbil, combining residential, retail, and commercial space under a single, considered standard of quality.",
-      "Phoenix Tower, our flagship, sits in the heart of the city's commercial district — a hub for business, lifestyle, and growth, designed with sustainability and smart technology at its core.",
-      "From ground-up new builds to renovations and extensions, every project is guided by the same measure: enduring value for the people who live and work inside it.",
-    ],
   },
   {
     slug: "fashion",
     index: "02",
-    name: "Fashion & Retail",
-    kicker: "Kiton Iraq",
-    short:
-      "Exclusive official distributor of Kiton across Iraq — the celebrated Neapolitan house of handmade menswear and timeless tailoring.",
-    description:
-      "Tunica is the exclusive official distributor of Kiton across Iraq — a prestigious Italian luxury house founded in Naples in 1968, renowned for handmade menswear and timeless tailoring.",
     image: "/images/kiton-boutique.jpg",
     imageAlt: "Interior of the Kiton boutique, Erbil",
-    highlights: [
-      { label: "House Founded", value: "1968" },
-      { label: "Origin", value: "Naples" },
-      { label: "Coverage", value: "Iraq" },
-    ],
-    body: [
-      "Tunica is the exclusive official distributor of Kiton across Iraq — bringing one of the world's most respected luxury houses to the region.",
-      "Founded in Naples in 1968, Kiton is renowned for handmade menswear and timeless tailoring, where each garment reflects generations of Neapolitan craftsmanship.",
-      "Our boutique offers a curated selection of Kiton's collections in a setting built to match the quality of the clothing itself.",
-    ],
   },
   {
     slug: "hospitality",
     index: "03",
-    name: "Hospitality",
-    kicker: "Chêne Café",
-    short:
-      "A French-style café within Phoenix Tower — one of Erbil's finest café experiences, and the Group's first step into hospitality.",
-    description:
-      "Chêne Café is a French-style café within Phoenix Tower, offering one of Erbil's finest café experiences in a vibrant, inviting atmosphere — the Group's first step into hospitality.",
     image: "/images/chene-storefront.jpg",
     imageAlt: "Chêne Café storefront signage at Phoenix Tower",
-    highlights: [
-      { label: "Concept", value: "French" },
-      { label: "Location", value: "Phoenix Tower" },
-      { label: "Chapter", value: "First" },
-    ],
-    body: [
-      "Chêne Café is a French-style café set within Phoenix Tower, offering one of Erbil's finest café experiences in a vibrant, inviting atmosphere.",
-      "It marks the Group's first step into hospitality — an extension of the same attention to detail that defines our developments and retail.",
-      "From the cup to the counter to the room around it, Chêne is designed as a destination, not just a stop.",
-    ],
   },
 ];
 
-export type Project = {
-  title: string;
-  sector: string;
-  status: "Completed" | "Ongoing";
-  location: string;
+export type ProjectId =
+  | "phoenix-tower"
+  | "phoenix-aerial"
+  | "kiton-boutique"
+  | "kiton-interior"
+  | "chene-storefront"
+  | "chene-bag";
+
+/** Structural project data — text (title, blurb, location) comes from the dictionary. */
+export const projectMeta: {
+  id: ProjectId;
+  sectorKey: "Real Estate" | "Fashion & Retail" | "Hospitality";
+  statusKey: "Completed" | "Ongoing";
   image: string;
   imageAlt: string;
-  blurb: string;
-};
-
-export const projects: Project[] = [
+}[] = [
   {
-    title: "Phoenix Tower",
-    sector: "Real Estate",
-    status: "Ongoing",
-    location: "Zagros Street, Erbil",
+    id: "phoenix-tower",
+    sectorKey: "Real Estate",
+    statusKey: "Ongoing",
     image: "/images/phoenix-tower.jpg",
     imageAlt: "Phoenix Tower exterior",
-    blurb:
-      "A flagship mixed-use tower — residences, retail, and hospitality anchored in Erbil's commercial district.",
   },
   {
-    title: "Phoenix Tower — Aerial",
-    sector: "Real Estate",
-    status: "Ongoing",
-    location: "Zagros Street, Erbil",
+    id: "phoenix-aerial",
+    sectorKey: "Real Estate",
+    statusKey: "Ongoing",
     image: "/images/phoenix-aerial.jpg",
     imageAlt: "Aerial view of Phoenix Tower and surrounding parkland",
-    blurb:
-      "The tower in context — overlooking parkland and the growing Erbil skyline.",
   },
   {
-    title: "Kiton Iraq Boutique",
-    sector: "Fashion & Retail",
-    status: "Completed",
-    location: "Phoenix Tower, Erbil",
+    id: "kiton-boutique",
+    sectorKey: "Fashion & Retail",
+    statusKey: "Completed",
     image: "/images/kiton-boutique.jpg",
     imageAlt: "Kiton boutique interior",
-    blurb:
-      "The exclusive Kiton retail environment in Iraq — Neapolitan tailoring in a considered, luxurious setting.",
   },
   {
-    title: "Kiton — Retail Interior",
-    sector: "Fashion & Retail",
-    status: "Completed",
-    location: "Phoenix Tower, Erbil",
+    id: "kiton-interior",
+    sectorKey: "Fashion & Retail",
+    statusKey: "Completed",
     image: "/images/kiton-interior.jpg",
     imageAlt: "Kiton retail interior detail",
-    blurb:
-      "Warm materials, natural light, and craftsmanship carried from the garments into the space.",
   },
   {
-    title: "Chêne Café",
-    sector: "Hospitality",
-    status: "Completed",
-    location: "Phoenix Tower, Erbil",
+    id: "chene-storefront",
+    sectorKey: "Hospitality",
+    statusKey: "Completed",
     image: "/images/chene-storefront.jpg",
     imageAlt: "Chêne Café storefront",
-    blurb:
-      "A French-style café concept — the Group's first hospitality venture, set within Phoenix Tower.",
   },
   {
-    title: "Chêne Café — Brand",
-    sector: "Hospitality",
-    status: "Completed",
-    location: "Phoenix Tower, Erbil",
+    id: "chene-bag",
+    sectorKey: "Hospitality",
+    statusKey: "Completed",
     image: "/images/chene-bag.jpg",
     imageAlt: "Chêne Café branded takeaway packaging",
-    blurb:
-      "Considered branding across every touchpoint, from the storefront to the cup in hand.",
   },
 ];
 
-export const stats = [
-  { value: "2018", label: "Founded in Erbil" },
-  { value: "3", label: "Sectors" },
-  { value: "150+", label: "Projects delivered" },
-  { value: "1", label: "Standard of quality" },
+/** Values for the stat row, paired with dictionary labels by key. */
+export const statValues: { key: keyof Dictionary["stats"]; value: string }[] = [
+  { key: "founded", value: "2018" },
+  { key: "sectors", value: "3" },
+  { key: "projects", value: "150+" },
+  { key: "standard", value: "1" },
 ];
+
+// ---- Localized view models (combine structure + dictionary) ----
+
+export type LocalizedSector = {
+  slug: SectorSlug;
+  index: string;
+  image: string;
+  imageAlt: string;
+  name: string;
+  kicker: string;
+  short: string;
+  body: string[];
+  highlights: { label: string; value: string }[];
+};
+
+export function getSectors(dict: Dictionary): LocalizedSector[] {
+  return sectorMeta.map((m) => {
+    const t = dict.sectors[m.slug];
+    return {
+      ...m,
+      name: t.name,
+      kicker: t.kicker,
+      short: t.short,
+      body: t.body,
+      highlights: t.highlights,
+    };
+  });
+}
+
+export function getSector(
+  dict: Dictionary,
+  slug: string,
+): LocalizedSector | undefined {
+  return getSectors(dict).find((s) => s.slug === slug);
+}
+
+export type LocalizedProject = {
+  id: ProjectId;
+  image: string;
+  imageAlt: string;
+  title: string;
+  blurb: string;
+  location: string;
+  sector: string;
+  status: string;
+};
+
+export function getProjects(dict: Dictionary): LocalizedProject[] {
+  return projectMeta.map((m) => {
+    const t = dict.projects[m.id];
+    return {
+      id: m.id,
+      image: m.image,
+      imageAlt: m.imageAlt,
+      title: t.title,
+      blurb: t.blurb,
+      location: t.location,
+      sector: dict.sectorLabels[m.sectorKey],
+      status: dict.statusLabels[m.statusKey],
+    };
+  });
+}
+
+export function getStats(dict: Dictionary): { value: string; label: string }[] {
+  return statValues.map((s) => ({ value: s.value, label: dict.stats[s.key] }));
+}
+
+export function getNav(dict: Dictionary, locale: Locale) {
+  return [
+    { label: dict.nav.about, href: localeHref(locale, "/about") },
+    { label: dict.nav.sectors, href: localeHref(locale, "/#sectors") },
+    { label: dict.nav.portfolio, href: localeHref(locale, "/portfolio") },
+    { label: dict.nav.contact, href: localeHref(locale, "/contact") },
+  ];
+}

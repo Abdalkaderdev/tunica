@@ -3,25 +3,18 @@
 import { useState } from "react";
 import { m } from "motion/react";
 import { site } from "@/lib/content";
+import type { Dictionary } from "@/i18n/dictionaries";
 
 type Status = "idle" | "submitting" | "success" | "error";
-
-const subjects = [
-  "General Inquiry",
-  "Real Estate",
-  "Fashion & Retail — Kiton",
-  "Hospitality — Chêne Café",
-  "Investment & Partnerships",
-] as const;
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const inputClass =
   "bg-transparent border-b border-ink/20 focus:border-gold outline-none py-3 w-full transition-colors";
-const labelClass =
-  "text-xs uppercase tracking-wide text-stone";
+const labelClass = "text-xs uppercase tracking-wide text-stone";
 
-export default function ContactForm() {
+export default function ContactForm({ dict }: { dict: Dictionary }) {
+  const t = dict.contactPage.form;
   const formspreeId = process.env.NEXT_PUBLIC_FORMSPREE_ID;
 
   const [status, setStatus] = useState<Status>("idle");
@@ -29,7 +22,6 @@ export default function ContactForm() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     const form = event.currentTarget;
     const data = new FormData(form);
 
@@ -70,26 +62,18 @@ export default function ContactForm() {
     try {
       const response = await fetch(`https://formspree.io/f/${formspreeId}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({ name, email, company, subject, message }),
       });
-
       if (response.ok) {
         setStatus("success");
       } else {
         setStatus("error");
-        setErrorMessage(
-          "Something went wrong sending your message. Please try again, or email us directly.",
-        );
+        setErrorMessage(t.errorGeneric);
       }
     } catch {
       setStatus("error");
-      setErrorMessage(
-        "We couldn't reach the server. Please check your connection and try again.",
-      );
+      setErrorMessage(t.errorNetwork);
     }
   }
 
@@ -102,12 +86,11 @@ export default function ContactForm() {
         transition={{ duration: 0.6, ease }}
         className="flex h-full flex-col justify-center"
       >
-        <p className="eyebrow">Message sent</p>
-        <h2 className="mt-4 font-serif text-3xl text-ink">Thank you.</h2>
+        <p className="eyebrow">{t.successKicker}</p>
+        <h2 className="mt-4 font-serif text-3xl text-ink">{t.successTitle}</h2>
         <p className="mt-4 max-w-md text-stone">
-          We&apos;ve received your message and will be in touch shortly. For
-          anything urgent, reach us directly at{" "}
-          <a href={`mailto:${site.email}`} className="link-underline text-ink">
+          {t.successBody}{" "}
+          <a href={`mailto:${site.email}`} className="link-underline text-ink" dir="ltr">
             {site.email}
           </a>
           .
@@ -123,68 +106,42 @@ export default function ContactForm() {
       {/* Honeypot — hidden from users, visible to bots. */}
       <div className="hidden" aria-hidden="true">
         <label htmlFor="_gotcha">Leave this field empty</label>
-        <input
-          type="text"
-          id="_gotcha"
-          name="_gotcha"
-          tabIndex={-1}
-          autoComplete="off"
-        />
+        <input type="text" id="_gotcha" name="_gotcha" tabIndex={-1} autoComplete="off" />
       </div>
 
       <div className="flex flex-col gap-2">
         <label htmlFor="name" className={labelClass}>
-          Name <span className="text-gold">*</span>
+          {t.name} <span className="text-gold">*</span>
         </label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          required
-          autoComplete="name"
-          className={inputClass}
-        />
+        <input type="text" id="name" name="name" required autoComplete="name" className={inputClass} />
       </div>
 
       <div className="flex flex-col gap-2">
         <label htmlFor="email" className={labelClass}>
-          Email <span className="text-gold">*</span>
+          {t.email} <span className="text-gold">*</span>
         </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          required
-          autoComplete="email"
-          className={inputClass}
-        />
+        <input type="email" id="email" name="email" required autoComplete="email" className={inputClass} dir="ltr" />
       </div>
 
       <div className="flex flex-col gap-2">
         <label htmlFor="company" className={labelClass}>
-          Company / Organisation
+          {t.company}
         </label>
-        <input
-          type="text"
-          id="company"
-          name="company"
-          autoComplete="organization"
-          className={inputClass}
-        />
+        <input type="text" id="company" name="company" autoComplete="organization" className={inputClass} />
       </div>
 
       <div className="flex flex-col gap-2">
         <label htmlFor="subject" className={labelClass}>
-          Subject <span className="text-gold">*</span>
+          {t.subject} <span className="text-gold">*</span>
         </label>
         <select
           id="subject"
           name="subject"
           required
-          defaultValue={subjects[0]}
+          defaultValue={t.subjects[0]}
           className={`${inputClass} cursor-pointer`}
         >
-          {subjects.map((subject) => (
+          {t.subjects.map((subject) => (
             <option key={subject} value={subject}>
               {subject}
             </option>
@@ -194,15 +151,9 @@ export default function ContactForm() {
 
       <div className="flex flex-col gap-2">
         <label htmlFor="message" className={labelClass}>
-          Message <span className="text-gold">*</span>
+          {t.message} <span className="text-gold">*</span>
         </label>
-        <textarea
-          id="message"
-          name="message"
-          required
-          rows={5}
-          className={`${inputClass} resize-y`}
-        />
+        <textarea id="message" name="message" required rows={5} className={`${inputClass} resize-y`} />
       </div>
 
       <div aria-live="polite" className="min-h-[1.25rem]">
@@ -225,7 +176,7 @@ export default function ContactForm() {
           disabled={submitting}
           className="btn btn-solid disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {submitting ? "Sending…" : "Send message"}
+          {submitting ? t.sending : t.send}
         </button>
       </div>
     </form>

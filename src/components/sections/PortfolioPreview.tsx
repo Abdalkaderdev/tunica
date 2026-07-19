@@ -2,34 +2,40 @@ import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/motion/Reveal";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
-import { projects } from "@/lib/content";
+import { getProjects, localeHref } from "@/lib/content";
+import type { Dictionary } from "@/i18n/dictionaries";
+import type { Locale } from "@/i18n/config";
 
-export default function PortfolioPreview() {
-  const featured = projects.slice(0, 3);
+export default function PortfolioPreview({
+  locale,
+  dict,
+}: {
+  locale: Locale;
+  dict: Dictionary;
+}) {
+  const featured = getProjects(dict).slice(0, 3);
+  const portfolioHref = localeHref(locale, "/portfolio");
 
   return (
     <section id="portfolio" className="bg-cream py-24 sm:py-32">
       <div className="wrap">
         <Reveal className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
           <div className="max-w-xl">
-            <div className="eyebrow">Portfolio</div>
+            <div className="eyebrow">{dict.portfolioSection.eyebrow}</div>
             <h2 className="text-3xl leading-[1.15] sm:text-4xl lg:text-[2.75rem]">
-              Recent &amp; ongoing work.
+              {dict.portfolioSection.heading}
             </h2>
           </div>
-          <Link href="/portfolio" className="link-underline shrink-0">
-            View all projects
+          <Link href={portfolioHref} className="link-underline shrink-0">
+            {dict.common.viewAllProjects}
             <span aria-hidden>→</span>
           </Link>
         </Reveal>
 
         <Stagger className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((project) => (
-            <StaggerItem key={project.title}>
-              <Link
-                href="/portfolio"
-                className="group block overflow-hidden rounded-sm"
-              >
+            <StaggerItem key={project.id}>
+              <Link href={portfolioHref} className="group block overflow-hidden rounded-sm">
                 <div className="relative aspect-[4/5] overflow-hidden">
                   <Image
                     src={project.image}

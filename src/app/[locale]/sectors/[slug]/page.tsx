@@ -4,26 +4,32 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Reveal from "@/components/motion/Reveal";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
-import { sectors } from "@/lib/content";
+import { getDictionary } from "@/i18n/dictionaries";
+import { isLocale, locales } from "@/i18n/config";
+import { getSector, getSectors, localeHref, sectorMeta, site } from "@/lib/content";
 
 export function generateStaticParams() {
-  return sectors.map((s) => ({ slug: s.slug }));
+  return locales.flatMap((locale) =>
+    sectorMeta.map((s) => ({ locale, slug: s.slug })),
+  );
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const sector = sectors.find((s) => s.slug === slug);
+  const { locale, slug } = await params;
+  if (!isLocale(locale)) return {};
+  const dict = getDictionary(locale);
+  const sector = getSector(dict, slug);
   if (!sector) return {};
   return {
     title: `${sector.name} — ${sector.kicker}`,
-    description: sector.description,
+    description: sector.short,
     openGraph: {
-      title: `${sector.name} — Tunica Group`,
-      description: sector.description,
+      title: `${sector.name} — ${site.name}`,
+      description: sector.short,
       images: [{ url: sector.image }],
     },
   };
@@ -32,13 +38,15 @@ export async function generateMetadata({
 export default async function SectorPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { slug } = await params;
-  const sector = sectors.find((s) => s.slug === slug);
+  const { locale, slug } = await params;
+  if (!isLocale(locale)) notFound();
+  const dict = getDictionary(locale);
+  const sector = getSector(dict, slug);
   if (!sector) notFound();
 
-  const others = sectors.filter((s) => s.slug !== slug);
+  const others = getSectors(dict).filter((s) => s.slug !== slug);
 
   return (
     <article>
@@ -78,8 +86,8 @@ export default async function SectorPage({
               </Reveal>
             ))}
             <Reveal delay={0.2}>
-              <Link href="/contact" className="btn btn-solid mt-4">
-                Inquire about {sector.name}
+              <Link href={localeHref(locale, "/contact")} className="btn btn-solid mt-4">
+                {dict.sectorsSection.inquireAbout} {sector.name}
               </Link>
             </Reveal>
           </div>
@@ -87,7 +95,7 @@ export default async function SectorPage({
           <Reveal>
             <div className="rounded-md border border-ink/10 bg-white/50 p-8">
               <div className="text-xs uppercase tracking-[0.18em] text-gold">
-                At a glance
+                {dict.sectorsSection.atAGlance}
               </div>
               <Stagger className="mt-6 space-y-6">
                 {sector.highlights.map((h) => (
@@ -96,9 +104,7 @@ export default async function SectorPage({
                     className="flex items-baseline justify-between border-b border-ink/10 pb-4"
                   >
                     <span className="text-sm text-stone/70">{h.label}</span>
-                    <span className="font-serif text-2xl text-ink">
-                      {h.value}
-                    </span>
+                    <span className="font-serif text-2xl text-ink">{h.value}</span>
                   </StaggerItem>
                 ))}
               </Stagger>
@@ -110,12 +116,12 @@ export default async function SectorPage({
       {/* Other sectors */}
       <section className="border-t border-ink/10 bg-cream pb-24">
         <div className="wrap pt-16">
-          <div className="eyebrow">Continue exploring</div>
+          <div className="eyebrow">{dict.common.continueExploring}</div>
           <div className="mt-8 grid gap-6 sm:grid-cols-2">
             {others.map((s) => (
               <Link
                 key={s.slug}
-                href={`/sectors/${s.slug}`}
+                href={localeHref(locale, `/sectors/${s.slug}`)}
                 className="group relative flex aspect-[16/9] items-end overflow-hidden rounded-sm p-6"
               >
                 <Image

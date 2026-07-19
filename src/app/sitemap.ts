@@ -1,55 +1,36 @@
 import type { MetadataRoute } from "next";
-import { site, sectors } from "@/lib/content";
+import { site, sectorMeta } from "@/lib/content";
+import { locales } from "@/i18n/config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
+  const lastModified = new Date("2026-07-19");
   const base = site.url;
 
-  const staticEntries: MetadataRoute.Sitemap = [
-    {
-      url: `${base}/`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 1.0,
-    },
-    {
-      url: `${base}/about`,
-      lastModified: now,
-      changeFrequency: "monthly",
+  const paths: { path: string; changeFrequency: "monthly" | "yearly"; priority: number }[] = [
+    { path: "", changeFrequency: "monthly", priority: 1.0 },
+    { path: "/about", changeFrequency: "monthly", priority: 0.8 },
+    { path: "/portfolio", changeFrequency: "monthly", priority: 0.8 },
+    { path: "/contact", changeFrequency: "yearly", priority: 0.6 },
+    { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
+    { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
+    ...sectorMeta.map((s) => ({
+      path: `/sectors/${s.slug}`,
+      changeFrequency: "monthly" as const,
       priority: 0.8,
-    },
-    {
-      url: `${base}/portfolio`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${base}/contact`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.6,
-    },
-    {
-      url: `${base}/privacy`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: `${base}/terms`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
+    })),
   ];
 
-  const sectorEntries: MetadataRoute.Sitemap = sectors.map((sector) => ({
-    url: `${base}/sectors/${sector.slug}`,
-    lastModified: now,
-    changeFrequency: "monthly",
-    priority: 0.8,
-  }));
-
-  return [...staticEntries, ...sectorEntries];
+  return locales.flatMap((locale) =>
+    paths.map(({ path, changeFrequency, priority }) => ({
+      url: `${base}/${locale}${path}`,
+      lastModified,
+      changeFrequency,
+      priority,
+      alternates: {
+        languages: Object.fromEntries(
+          locales.map((l) => [l, `${base}/${l}${path}`]),
+        ),
+      },
+    })),
+  );
 }

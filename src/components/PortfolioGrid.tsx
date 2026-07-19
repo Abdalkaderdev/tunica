@@ -3,22 +3,26 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { AnimatePresence, m } from "motion/react";
-import type { Project } from "@/lib/content";
+import type { LocalizedProject } from "@/lib/content";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-export default function PortfolioGrid({ projects }: { projects: Project[] }) {
+export default function PortfolioGrid({
+  projects,
+  allLabel,
+}: {
+  projects: LocalizedProject[];
+  allLabel: string;
+}) {
   const filters = useMemo(() => {
     const set = Array.from(new Set(projects.map((p) => p.sector)));
-    return ["All", ...set];
-  }, [projects]);
+    return [allLabel, ...set];
+  }, [projects, allLabel]);
 
-  const [active, setActive] = useState("All");
+  const [active, setActive] = useState(allLabel);
 
   const visible =
-    active === "All"
-      ? projects
-      : projects.filter((p) => p.sector === active);
+    active === allLabel ? projects : projects.filter((p) => p.sector === active);
 
   return (
     <div>
@@ -43,7 +47,7 @@ export default function PortfolioGrid({ projects }: { projects: Project[] }) {
         <AnimatePresence mode="popLayout">
           {visible.map((project) => (
             <m.article
-              key={project.title}
+              key={project.id}
               layout
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -59,7 +63,7 @@ export default function PortfolioGrid({ projects }: { projects: Project[] }) {
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="object-cover transition-transform duration-700 ease-smooth group-hover:scale-105"
                 />
-                <span className="absolute left-4 top-4 rounded-full bg-cream/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-ink">
+                <span className="absolute start-4 top-4 rounded-full bg-cream/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-ink">
                   {project.status}
                 </span>
               </div>
@@ -67,15 +71,11 @@ export default function PortfolioGrid({ projects }: { projects: Project[] }) {
                 <div className="text-xs uppercase tracking-[0.16em] text-gold">
                   {project.sector}
                 </div>
-                <h3 className="mt-2 font-serif text-xl text-ink">
-                  {project.title}
-                </h3>
+                <h3 className="mt-2 font-serif text-xl text-ink">{project.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-stone/80">
                   {project.blurb}
                 </p>
-                <div className="mt-4 text-xs text-stone/60">
-                  {project.location}
-                </div>
+                <div className="mt-4 text-xs text-stone/60">{project.location}</div>
               </div>
             </m.article>
           ))}

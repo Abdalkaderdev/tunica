@@ -1,32 +1,37 @@
 import Link from "next/link";
-import { nav, site } from "@/lib/content";
+import Logo from "@/components/Logo";
+import { getNav, localeHref, site } from "@/lib/content";
+import type { Dictionary } from "@/i18n/dictionaries";
+import type { Locale } from "@/i18n/config";
 
-export default function Footer() {
-  const year = 2018; // group founding; current year appended below at render
+export default function Footer({
+  locale,
+  dict,
+}: {
+  locale: Locale;
+  dict: Dictionary;
+}) {
+  const nav = getNav(dict, locale);
   return (
     <footer className="bg-ink text-cream">
       <div className="wrap grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1fr] md:py-20">
         <div className="max-w-sm">
-          <Link
-            href="/"
-            className="font-serif text-2xl tracking-tightish text-cream"
-          >
-            Tunica<span className="text-gold"> Group</span>
+          <Link href={localeHref(locale, "/")} className="text-cream">
+            <Logo />
           </Link>
           <p className="mt-4 text-sm leading-relaxed text-cream/60">
-            A diversified enterprise across real estate, fashion, and
-            hospitality — building lasting value in Erbil, Iraq since {year}.
+            {dict.footer.tagline}
           </p>
         </div>
 
         <div>
           <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-            Explore
+            {dict.footer.explore}
           </h4>
           <ul className="space-y-3 text-sm text-cream/70">
             <li>
-              <Link href="/" className="hover:text-gold">
-                Home
+              <Link href={localeHref(locale, "/")} className="hover:text-gold">
+                {dict.nav.home}
               </Link>
             </li>
             {nav.map((item) => (
@@ -41,7 +46,7 @@ export default function Footer() {
 
         <div>
           <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-            Contact
+            {dict.footer.contact}
           </h4>
           <ul className="space-y-3 text-sm text-cream/70">
             <li>
@@ -54,7 +59,7 @@ export default function Footer() {
                 {site.phone}
               </a>
             </li>
-            <li className="leading-relaxed">
+            <li className="leading-relaxed" dir="ltr">
               {site.address.line1}
               <br />
               {site.address.line2}
@@ -75,13 +80,15 @@ export default function Footer() {
 
       <div className="border-t border-cream/10">
         <div className="wrap flex flex-col items-center justify-between gap-4 py-6 text-xs text-cream/50 sm:flex-row">
-          <p>© {year}–present Tunica Group. All rights reserved.</p>
+          <p>
+            © {site.founded}–present {site.name}. {dict.footer.rights}
+          </p>
           <div className="flex gap-6">
-            <Link href="/privacy" className="hover:text-gold">
-              Privacy Policy
+            <Link href={localeHref(locale, "/privacy")} className="hover:text-gold">
+              {dict.footer.privacy}
             </Link>
-            <Link href="/terms" className="hover:text-gold">
-              Terms &amp; Conditions
+            <Link href={localeHref(locale, "/terms")} className="hover:text-gold">
+              {dict.footer.terms}
             </Link>
           </div>
         </div>
