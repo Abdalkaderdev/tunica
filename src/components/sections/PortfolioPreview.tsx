@@ -28,7 +28,7 @@ export default function PortfolioPreview({
           </div>
           <Link href={portfolioHref} className="link-underline shrink-0">
             {dict.common.viewAllProjects}
-            <span aria-hidden>→</span>
+            <span aria-hidden className="dir-arrow">→</span>
           </Link>
         </Reveal>
 

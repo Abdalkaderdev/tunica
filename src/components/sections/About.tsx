@@ -55,7 +55,7 @@ export default function About({
           <Reveal delay={0.15}>
             <Link href={localeHref(locale, "/about")} className="link-underline mt-8">
               {dict.common.readStory}
-              <span aria-hidden>→</span>
+              <span aria-hidden className="dir-arrow">→</span>
             </Link>
           </Reveal>
 

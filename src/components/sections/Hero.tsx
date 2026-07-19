@@ -74,7 +74,7 @@ export default function Hero({
             href={localeHref(locale, "/#sectors")}
             className="text-sm font-semibold text-cream/80 transition-colors hover:text-goldlight"
           >
-            {dict.common.exploreSectors} →
+            {dict.common.exploreSectors} <span className="dir-arrow">→</span>
           </Link>
         </m.div>
       </div>

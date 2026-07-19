@@ -49,7 +49,7 @@ export default function Sectors({
                     {dict.common.exploreSector}
                     <span
                       aria-hidden
-                      className="transition-transform duration-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
+                      className="dir-arrow transition-transform duration-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
                     >
                       →
                     </span>

@@ -118,7 +118,7 @@ export default async function AboutPage({
                 href={localeHref(locale, "/portfolio")}
                 className="text-sm font-semibold text-cream/80 transition-colors hover:text-goldlight"
               >
-                {t.viewPortfolio} →
+                {t.viewPortfolio} <span className="dir-arrow">→</span>
               </Link>
             </div>
           </Reveal>
