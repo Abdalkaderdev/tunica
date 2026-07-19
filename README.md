@@ -34,7 +34,7 @@ src/
     contact/              # contact page + form
     privacy/ terms/       # legal
     sitemap.ts robots.ts  # SEO
-    icon.tsx opengraph-image.tsx
+    icon.svg              # favicon (static); OG image at public/og.png
   components/
     Header.tsx Footer.tsx
     sections/             # home page sections
