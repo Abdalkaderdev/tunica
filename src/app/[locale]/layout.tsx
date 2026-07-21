@@ -1,11 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import {
-  Fraunces,
-  Manrope,
-  Noto_Kufi_Arabic,
-  Noto_Sans_Arabic,
-} from "next/font/google";
 import "../globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -14,34 +8,7 @@ import JsonLd from "@/components/JsonLd";
 import { getDictionary } from "@/i18n/dictionaries";
 import { dir, isLocale, locales } from "@/i18n/config";
 import { site } from "@/lib/content";
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-fraunces",
-  display: "swap",
-});
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-manrope",
-  display: "swap",
-});
-
-const notoKufi = Noto_Kufi_Arabic({
-  subsets: ["arabic"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-noto-kufi",
-  display: "swap",
-});
-
-const notoSansArabic = Noto_Sans_Arabic({
-  subsets: ["arabic"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-noto-arabic",
-  display: "swap",
-});
+import { fraunces, manrope, notoKufi, notoSansArabic } from "@/fonts";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
